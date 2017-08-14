@@ -1,3 +1,5 @@
+import json
+
 class HTTPSessionObjectType():
 	def parse(properties):
 		attributes = []
