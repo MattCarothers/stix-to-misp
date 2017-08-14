@@ -14,7 +14,7 @@
 # optional arguments:
 #   -h, --help            show this help message and exit
 #   -u MISP_URL, --misp-url MISP_URL
-#                         MISP server URL (defaults to https://localhost)
+#                         MISP server URL (default to https://localhost)
 #   -k MISP_KEY, --misp-key MISP_KEY
 #                         MISP API key
 #   -v VERIFY_CERT, --verify-cert VERIFY_CERT
@@ -116,7 +116,7 @@ def create_attributes(object_, parent_value=None, misp_comment=None, indicator_t
 		for attribute in attributes:
 			if attribute['type'] != 'text':
 				value = attribute['value']
-			print(indent, ", ".join([id_, xsi_type, attribute['type'], value]))
+			print(indent, ", ".join([id_, xsi_type, attribute['type'], str(value)]))
 			attribute['distribution'] = 5
 			attribute['timestamp']    = indicator_timestamp
 			# The comment field will be the indicator description (if there is one) or
@@ -230,8 +230,8 @@ def parse_package(input_file):
 			uniq_attributes.append(attribute)
 			uniq[attribute['value']] = True
 
-	# Return the MISP Event object structure
-	return {
+	# Return the attributes and the MISP Event object structure
+	return uniq_attributes, {
 		'uuid'            : str(uuid_),
                 'published'       : 1,
                 'info'            : pkg.id_,
@@ -258,7 +258,7 @@ if __name__ == "__main__":
 	# Parse the command line arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument("input_file", help="An AIS or CISCP XML STIX Package file")
-	parser.add_argument("-u", "--misp-url", help="MISP server URL (defaults to https://localhost)", default="https://localhost")
+	parser.add_argument("-u", "--misp-url", help="MISP server URL (default to https://localhost)", default="https://localhost")
 	parser.add_argument("-k", "--misp-key", help="MISP API key", required=True)
 	parser.add_argument("-v", "--verify-cert", help="Verify TLS certificate (defaults to true)", default=True)
 	parser.add_argument("-d", "--distribution", help="MISP Event distribution (org, community, connected, all, or a sharing group UUID)", default="org")
@@ -314,7 +314,7 @@ if __name__ == "__main__":
 		raise ValueError("Threat level must be 'high', 'medium', 'low', or 'undefined'")
 	
 	# Load the input file, parse it, and generate a MISP event with attributes
-	event = parse_package(args.input_file)
+	attributes, event = parse_package(args.input_file)
 
 	# Each MISP event gets a comment attribute
 	# with the input file name as its value
@@ -348,5 +348,5 @@ if __name__ == "__main__":
 	if 'errors' in response_dict:
 		print("Errors:", json.dumps(response_dict['errors'], indent=1))
 		for index in response_dict['errors']['Attribute'].keys():
-			print("Error:", uniq_attributes[int(index)])
+			print("Error:", attributes[int(index)])
 		sys.exit(1)
