@@ -1,4 +1,4 @@
-#from . import TestType
+# Import everything in this directory
 __all__ = []
 
 import pkgutil
