@@ -1,3 +1,5 @@
+import re
+
 class URIObjectType():
 	def parse(properties):
 		attributes = []
@@ -8,6 +10,9 @@ class URIObjectType():
 		value = value.replace('[:]', ':')
 		value = value.replace('. ', '.')
 		value = value.replace(' .', '.')
+		# Sometimes URLs have line breaks in them for some
+		# inexplicable reason.
+		value = re.sub('\s+', '', value)
 		attributes.append({
 			'category'     : 'Network activity',
 			'type'         : 'uri',
