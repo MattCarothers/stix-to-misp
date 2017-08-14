@@ -4,8 +4,11 @@ class DomainNameObjectType():
 	def parse(properties):
 		attributes = []
 		value = properties.value.value.rstrip()
+		# Refang the domain
+		value = value.replace('[.]', '.')
+		value = value.replace('[d]', '.')
 		# GIGO
-		if re.search('://', value):
+		if re.search('/', value):
 			# This is a URL stored as a domain
 			attributes.append({
 				'category'     : 'Network activity',
