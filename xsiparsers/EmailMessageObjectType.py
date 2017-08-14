@@ -4,12 +4,20 @@ class EmailMessageObjectType():
 	def parse(properties):
 		attributes = []
 		# properties.header.from_ is an "AddressObjectType"
-		# with a category of 'email'
+		# with a category of 'email'.  There may also be
+		# a properties.header.sender with the same structure.
+		sources = []
 		if properties.header.from_:
-			from_ = properties.header.from_
-			f_xsi_type = from_._XSI_TYPE
-			category = from_.category
-			value = from_.address_value.value
+			sources.append(properties.header.from_)
+		if properties.header.sender:
+			sources.append(properties.header.sender)
+		
+		for sender in sources:
+			category = sender.category
+			value = sender.address_value.value
+			# Refang the address
+			value = value.replace('[.]', '.')
+			value = value.replace('[@]', '.')
 			# The value may be in the form of "Name <user@host>."
 			# A MISP email-src can only contain the user@host.
 			m = re.match('(.*)<(.*)>', value)
@@ -22,6 +30,11 @@ class EmailMessageObjectType():
 					'value'        : name,
 					'to_ids'       : 0
 				})
+			# No idea why, but sometimes email sources are in the format
+			# destination@victim.com [sender@attacker.com]
+			m = re.search('\[(.*)\]', value)
+			if m:
+				value = m.group(1)
 			attributes.append({
 				'category'     : 'Payload delivery',
 				'type'         : 'email-src',
@@ -30,6 +43,8 @@ class EmailMessageObjectType():
 			})
 		if properties.header.subject:
 			value = properties.subject.value
+			# Make sure the subject has no line breaks(???)
+			value = re.sub('\n', '', value)
 			attributes.append({
 				'category'     : 'Payload delivery',
 				'type'         : 'email-subject',
