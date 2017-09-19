@@ -260,7 +260,7 @@ if __name__ == "__main__":
 	parser.add_argument("input_file", help="An AIS or CISCP XML STIX Package file")
 	parser.add_argument("-u", "--misp-url", help="MISP server URL (default to https://localhost)", default="https://localhost")
 	parser.add_argument("-k", "--misp-key", help="MISP API key", required=True)
-	parser.add_argument("-v", "--verify-cert", help="Verify TLS certificate (defaults to true)", default=True)
+	parser.add_argument("-v", "--verify-cert", help="Verify TLS certificate (defaults to true)", default="yes")
 	parser.add_argument("-d", "--distribution", help="MISP Event distribution (org, community, connected, all, or a sharing group UUID)", default="org")
 	parser.add_argument("-t", "--tags", help="MISP Event tags (use multiple times to set more than one tag)", action="append")
 	parser.add_argument("-l", "--level", help="MISP threat level (high, medium, low, or undefined - defaults to low)", default="low")
