@@ -162,10 +162,21 @@ def parse_package(input_file):
 	# Extract the header from the package
 	header = pkg.stix_header
 	print("Title:", header.title)
+	print("Description:", header.description)
 
 	# "attributes" holds all the MISP attributes (e.g. the indicators
 	# for the MISP event.
 	attributes = []
+
+	# If the package has a description, add it as an attribute
+	if header.description:
+		attributes.append({
+			'category'     : 'Other',
+			'type'         : 'comment',
+			'value'        : str(header.description),
+			'to_ids'       : 0,
+			'distribution' : 5
+		})
 
 	# Create a dictionary to map objects to their ids so we can
 	# dereference them later.
